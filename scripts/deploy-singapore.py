@@ -85,7 +85,10 @@ test -f /etc/tactile/env
 set -a
 . /etc/tactile/env
 set +a
-for d in /opt/tactile/backend /opt/tactile-app/backend /srv/tactile/backend; do
+for v in /opt/tactile/.venv/bin/activate /opt/tactile-app/.venv/bin/activate; do
+  if [ -f "$v" ]; then . "$v"; break; fi
+done
+for d in /opt/tactile/backend /opt/tactile-app/backend; do
   if [ -d "$d" ]; then cd "$d"; break; fi
 done
 export PYTHONPATH=.
