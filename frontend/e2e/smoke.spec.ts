@@ -13,14 +13,14 @@ test.describe('Agent Ops E2E', () => {
     await expect(page).toHaveURL(/\/agent-ops\/?$/)
     await expect(page.getByRole('heading', { name: '总览' })).toBeVisible()
 
-    await page.getByRole('link', { name: '账号市场' }).click()
+    await page.getByRole('link', { name: '🛒 账号市场' }).click()
     await expect(page.getByText('购买账号').first()).toBeVisible({ timeout: 15000 })
 
     await page.getByRole('link', { name: '个人资料' }).click()
     await page.locator('#profile-nickname').fill('E2E 昵称')
     await page.getByRole('button', { name: '保存昵称' }).click()
     await expect(page.getByText('已保存')).toBeVisible()
-    await expect(page.getByText(EMAIL)).toBeVisible()
+    await expect(page.getByRole('main').getByText(EMAIL)).toBeVisible()
   })
 
   test('login with existing flow', async ({ page }) => {
