@@ -2,6 +2,8 @@
 
 Social account task orchestration platform (**test environment**).
 
+**Repository:** https://github.com/SpreadXAI/agent-ops
+
 - Frontend: Vue 3 + Vite + Tailwind (static + Nginx)
 - Backend: FastAPI + PostgreSQL (`agent_ops_test` schema on tactile RDS)
 - Deploy: imjson ECS, path `/agent-ops/` (same pattern as tactile)

@@ -40,7 +40,7 @@ mkdir -p "$REMOTE_DIR" "$WEB_DIR"
 cd "$REMOTE_DIR"
 
 if [ ! -d .git ]; then
-  git clone https://github.com/mijunri/agent-ops.git .
+  git clone https://github.com/SpreadXAI/agent-ops.git .
 fi
 git fetch origin main && git reset --hard origin/main
 

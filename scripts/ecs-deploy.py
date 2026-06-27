@@ -99,7 +99,7 @@ if [ -z "$DATABASE_PASSWORD" ]; then echo "missing DB password from tactile"; ex
 
 mkdir -p "$REMOTE_DIR" "$WEB_DIR"
 if [ -d "$REMOTE_DIR/.git" ]; then
-  cd "$REMOTE_DIR" && git fetch origin main && git reset --hard origin/main
+  cd "$REMOTE_DIR" && git remote set-url origin "$CLONE_URL" && git fetch origin main && git reset --hard origin/main
 else
   rm -rf "$REMOTE_DIR"/* "$REMOTE_DIR"/.[!.]* 2>/dev/null || true
   git clone "$CLONE_URL" "$REMOTE_DIR"
@@ -186,9 +186,9 @@ def main() -> None:
     )
     subprocess.run(["git", "push", "origin", "main"], cwd=ROOT, check=True)
 
-    clone_url = "https://github.com/mijunri/agent-ops.git"
+    clone_url = "https://github.com/SpreadXAI/agent-ops.git"
     if gh_token:
-        clone_url = f"https://{gh_token}@github.com/mijunri/agent-ops.git"
+        clone_url = f"https://{gh_token}@github.com/SpreadXAI/agent-ops.git"
 
     remote_script = build_remote_script(jwt_secret, clone_url)
     encoded = base64.b64encode(remote_script.encode()).decode()
