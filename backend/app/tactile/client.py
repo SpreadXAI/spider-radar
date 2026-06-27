@@ -77,3 +77,12 @@ class TactileClient:
 
     def update_agent(self, agent_id: int, body: dict[str, Any]) -> dict[str, Any]:
         return self._request("PUT", f"/agent/{agent_id}", body)
+
+    def update_agent_bindings(self, agent_id: int, bindings: dict[str, Any]) -> dict[str, Any]:
+        return self._request("PUT", f"/agent/{agent_id}/bindings", bindings)
+
+    def list_workspace_skills(self, workspace_id: int) -> dict[str, Any]:
+        return self._request("GET", f"/skill-plaza/manage?workspace_id={workspace_id}")
+
+    def get_skill(self, skill_id: int) -> dict[str, Any]:
+        return self._request("GET", f"/skill-plaza/{skill_id}")

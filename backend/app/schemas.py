@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from app.models import AccountStatus, AccountTier, InvitationStatus, TaskStatus, WorkspaceMemberRole
+from app.models import AccountStatus, AccountTier, InvitationStatus, SkillLayer, TaskStatus, WorkspaceMemberRole
 
 if TYPE_CHECKING:
     from app.models import SocialAccount
@@ -261,3 +261,67 @@ class DashboardStats(BaseModel):
 
 
 AdminWorkspaceDetail.model_rebuild()
+
+
+class SkillCatalogSkill(BaseModel):
+    id: int
+    slug: str
+    name: str
+    description: str = ""
+    layer: SkillLayer
+    current_version_id: int | None = None
+    current_version: str | None = None
+    workspace_id: int | None = None
+
+
+class SkillCatalogOut(BaseModel):
+    platform: list[SkillCatalogSkill] = Field(default_factory=list)
+    workspace: list[SkillCatalogSkill] = Field(default_factory=list)
+    mine: list[SkillCatalogSkill] = Field(default_factory=list)
+
+
+class AccountSkillBindingOut(BaseModel):
+    id: int
+    account_id: int
+    skill_id: int
+    version_id: int
+    slug: str
+    name: str
+    layer: SkillLayer
+    inputs_json: str | None = None
+    outputs_json: str | None = None
+    sort_order: int
+    enabled: bool
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class BatchSkillInstallRequest(BaseModel):
+    skill_id: int
+    version_id: int
+    account_ids: list[int] = Field(min_length=1)
+    slug: str = ""
+    name: str = ""
+    layer: SkillLayer = SkillLayer.account
+    inputs_json: str | None = None
+    outputs_json: str | None = None
+
+
+class BatchSkillInstallResult(BaseModel):
+    skill_id: int
+    version_id: int
+    account_ids: list[int]
+    installed_count: int
+
+
+class SkillCreateSessionRequest(BaseModel):
+    prompt: str = Field(min_length=10)
+    title: str = Field(default="Spider Radar Skill", max_length=200)
+    account_id: int | None = None
+
+
+class SkillCreateSessionOut(BaseModel):
+    tactile_work_id: int | None
+    tactile_session_id: str | None
+    message: str

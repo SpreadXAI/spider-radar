@@ -131,6 +131,38 @@ export type AccountRunResult = {
   message: string
 }
 
+export type SkillCatalogItem = {
+  id: number
+  slug: string
+  name: string
+  description: string
+  layer: string
+  current_version_id: number | null
+  current_version: string | null
+  workspace_id: number | null
+}
+
+export type SkillCatalog = {
+  platform: SkillCatalogItem[]
+  workspace: SkillCatalogItem[]
+  mine: SkillCatalogItem[]
+}
+
+export type AccountSkillBinding = {
+  id: number
+  account_id: number
+  skill_id: number
+  version_id: number
+  slug: string
+  name: string
+  layer: string
+  inputs_json: string | null
+  outputs_json: string | null
+  sort_order: number
+  enabled: boolean
+  created_at: string
+}
+
 function authHeaders(token: string | null): HeadersInit {
   const headers: HeadersInit = { 'Content-Type': 'application/json' }
   if (token) headers.Authorization = `Bearer ${token}`
@@ -204,6 +236,35 @@ export const api = {
     }),
   runAccount: (token: string, accountId: number) =>
     request<AccountRunResult>(`/my/accounts/${accountId}/run`, token, { method: 'POST' }),
+  skillCatalog: (token: string) => request<SkillCatalog>('/skills/catalog', token),
+  accountSkills: (token: string, accountId: number) =>
+    request<AccountSkillBinding[]>(`/skills/my/accounts/${accountId}/bindings`, token),
+  batchInstallSkill: (
+    token: string,
+    body: {
+      skill_id: number
+      version_id: number
+      account_ids: number[]
+      slug?: string
+      name?: string
+      inputs_json?: string
+      outputs_json?: string
+    },
+  ) =>
+    request<{ skill_id: number; version_id: number; account_ids: number[]; installed_count: number }>(
+      '/skills/batch-install',
+      token,
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
+  createSkillSession: (
+    token: string,
+    body: { prompt: string; title?: string; account_id?: number },
+  ) =>
+    request<{ tactile_work_id: number | null; tactile_session_id: string | null; message: string }>(
+      '/skills/create-session',
+      token,
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
   listSchedules: (token: string, accountId: number) =>
     request<Schedule[]>(`/my/accounts/${accountId}/schedules`, token),
   createSchedule: (

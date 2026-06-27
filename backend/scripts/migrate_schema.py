@@ -74,6 +74,33 @@ def migrate() -> None:
                 conn.execute(text(f'ALTER TABLE "{schema}".execution_logs ADD COLUMN tactile_session_id VARCHAR(64)'))
                 print("Added execution_logs.tactile_session_id")
 
+        if not has_table("account_skill_bindings"):
+            conn.execute(
+                text(
+                    f"""
+                    CREATE TABLE "{schema}".account_skill_bindings (
+                        id SERIAL PRIMARY KEY,
+                        account_id INTEGER NOT NULL REFERENCES "{schema}".social_accounts(id),
+                        skill_id INTEGER NOT NULL,
+                        version_id INTEGER NOT NULL,
+                        slug VARCHAR(128) NOT NULL DEFAULT '',
+                        name VARCHAR(200) NOT NULL DEFAULT '',
+                        layer VARCHAR(32) NOT NULL DEFAULT 'account',
+                        inputs_json TEXT,
+                        outputs_json TEXT,
+                        sort_order INTEGER NOT NULL DEFAULT 0,
+                        enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                        created_at TIMESTAMPTZ DEFAULT NOW(),
+                        CONSTRAINT uq_account_skill UNIQUE (account_id, skill_id)
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(f'CREATE INDEX idx_account_skill_account ON "{schema}".account_skill_bindings (account_id)')
+            )
+            print("Created account_skill_bindings")
+
         if has_table("batch_tasks") and not has_column("batch_tasks", "workspace_id"):
             conn.execute(text(f'ALTER TABLE "{schema}".batch_tasks ADD COLUMN workspace_id INTEGER'))
             print("Added batch_tasks.workspace_id")

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings
 from app.models import AccountPrompt, SocialAccount
 from app.tactile.client import TactileClient, TactileError
+from app.tactile.skill_bindings import merged_skill_bindings
 
 
 def build_agent_instructions(
@@ -39,19 +40,9 @@ def _prompt_for_account(db: Session, account: SocialAccount) -> tuple[str, str]:
 
 
 def _template_skill_bindings(settings: Settings, client: TactileClient) -> list[dict[str, int]]:
-    if settings.tactile_template_agent_id:
-        detail = client.get_agent(settings.tactile_template_agent_id)
-        bindings = detail.get("bindings") or {}
-        skills = bindings.get("skills") or []
-        return [{"skill_id": int(s["skill_id"]), "version_id": int(s["version_id"])} for s in skills]
-    if settings.tactile_template_skill_id and settings.tactile_template_skill_version_id:
-        return [
-            {
-                "skill_id": settings.tactile_template_skill_id,
-                "version_id": settings.tactile_template_skill_version_id,
-            }
-        ]
-    return []
+    from app.tactile.skill_bindings import template_skill_bindings
+
+    return template_skill_bindings(settings, client)
 
 
 def _default_env_vars(settings: Settings) -> list[dict[str, object]]:
@@ -77,7 +68,7 @@ def ensure_account_agent(db: Session, settings: Settings, account: SocialAccount
 
     persona, prompt_text = _prompt_for_account(db, account)
     client = TactileClient(settings)
-    skills = _template_skill_bindings(settings, client)
+    skills = merged_skill_bindings(settings, client, db, account)
     bindings = {"skills": skills} if skills else None
     env_vars = _default_env_vars(settings)
 

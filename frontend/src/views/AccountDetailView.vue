@@ -62,6 +62,27 @@
 
     <div class="card space-y-4 p-6 lg:col-span-2">
       <div class="flex items-center justify-between">
+        <h2 class="font-semibold">已安装 Skill</h2>
+        <RouterLink to="/skills" class="text-sm text-brand-600 hover:underline">Skill 创作 →</RouterLink>
+      </div>
+      <div v-if="accountSkills.length" class="space-y-2">
+        <div
+          v-for="s in accountSkills"
+          :key="s.id"
+          class="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-2 text-sm"
+        >
+          <div>
+            <span class="font-medium">{{ s.name }}</span>
+            <span class="ml-2 text-xs text-slate-500">{{ s.slug }} · {{ s.layer }}</span>
+          </div>
+          <span v-if="s.enabled" class="badge bg-green-100 text-green-700">启用</span>
+        </div>
+      </div>
+      <p v-else class="text-sm text-slate-500">尚未安装账号层 Skill，可在 Skill 创作页批量安装。</p>
+    </div>
+
+    <div class="card space-y-4 p-6 lg:col-span-2">
+      <div class="flex items-center justify-between">
         <h2 class="font-semibold">定时任务（最多 3 个，每次 30 分钟）</h2>
         <span class="text-sm text-slate-500">{{ schedules.length }} / 3</span>
       </div>
@@ -98,15 +119,16 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, RouterLink } from 'vue-router'
 import AccountCard from '@/components/AccountCard.vue'
-import { api, type Schedule, type SocialAccount } from '@/api/client'
+import { api, type AccountSkillBinding, type Schedule, type SocialAccount } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const auth = useAuthStore()
 const accountId = Number(route.params.id)
 const account = ref<SocialAccount | null>(null)
+const accountSkills = ref<AccountSkillBinding[]>([])
 const schedules = ref<Schedule[]>([])
 const persona = ref('')
 const promptText = ref('')
@@ -137,6 +159,7 @@ async function load() {
     promptText.value = p.prompt_text
   }
   schedules.value = await api.listSchedules(auth.token, accountId)
+  accountSkills.value = await api.accountSkills(auth.token, accountId)
   loading.value = false
 }
 

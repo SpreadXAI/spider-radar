@@ -40,6 +40,7 @@ const router = createRouter({
           name: 'account-detail',
           component: () => import('@/views/AccountDetailView.vue'),
         },
+        { path: 'skills', name: 'skills', component: () => import('@/views/SkillStudioView.vue') },
         { path: 'batch-tasks', name: 'batch-tasks', component: () => import('@/views/BatchTasksView.vue') },
         { path: 'logs', name: 'logs', component: () => import('@/views/LogsView.vue') },
         { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue') },

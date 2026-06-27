@@ -39,6 +39,12 @@ class TaskStatus(str, enum.Enum):
     failed = "failed"
 
 
+class SkillLayer(str, enum.Enum):
+    platform = "platform"
+    workspace = "workspace"
+    account = "account"
+
+
 class WorkspaceMemberRole(str, enum.Enum):
     owner = "owner"
     member = "member"
@@ -156,6 +162,29 @@ class SocialAccount(Base):
     prompt: Mapped["AccountPrompt | None"] = relationship(back_populates="account", uselist=False)
     schedules: Mapped[list["ScheduledTask"]] = relationship(back_populates="account")
     logs: Mapped[list["ExecutionLog"]] = relationship(back_populates="account")
+    skill_bindings: Mapped[list["AccountSkillBinding"]] = relationship(
+        back_populates="account", cascade="all, delete-orphan"
+    )
+
+
+class AccountSkillBinding(Base):
+    __tablename__ = "account_skill_bindings"
+    __table_args__ = (UniqueConstraint("account_id", "skill_id", name="uq_account_skill"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("social_accounts.id"), index=True)
+    skill_id: Mapped[int] = mapped_column(Integer, index=True)
+    version_id: Mapped[int] = mapped_column(Integer)
+    slug: Mapped[str] = mapped_column(String(128), default="")
+    name: Mapped[str] = mapped_column(String(200), default="")
+    layer: Mapped[SkillLayer] = mapped_column(Enum(SkillLayer), default=SkillLayer.account)
+    inputs_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    outputs_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    account: Mapped[SocialAccount] = relationship(back_populates="skill_bindings")
 
 
 class AccountPrompt(Base):
