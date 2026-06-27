@@ -1,43 +1,39 @@
-# Agent Ops
+# SpreadFleet（传播舰队）
 
-Social account task orchestration platform (**test environment**).
+社媒账号舰队管理与任务编排平台（**测试环境**）。
 
-**Repository:** https://github.com/SpreadXAI/agent-ops
+**Repository:** https://github.com/SpreadXAI/spread-fleet
 
-- Frontend: Vue 3 + Vite + Tailwind (static + Nginx)
-- Backend: FastAPI + PostgreSQL (`agent_ops_test` schema on tactile RDS)
-- Deploy: imjson ECS, path `/agent-ops/` (same pattern as tactile)
+- Frontend: Vue 3 + Vite + Tailwind（静态 + Nginx）
+- Backend: FastAPI + PostgreSQL（`agent_ops_test` schema）
+- Deploy: imjson ECS，路径 `/spreadfleet/`
 
-## Live (test)
+## 线上访问
 
-- http://118.31.57.25/agent-ops/
-- http://imjson.cn/agent-ops/ (if DNS routes to imjson)
+- http://118.31.57.25/spreadfleet/
+- 旧路径 `/agent-ops/` 会自动跳转到新地址
 
-## Local dev
+## 本地开发
 
 ```bash
-# backend
 cd backend && python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env  # set DATABASE_PASSWORD
+cp .env.example .env
 export PYTHONPATH=.
 uvicorn app.main:app --reload --port 9092
 
-# frontend
-cd frontend && npm ci && npm run dev
+cd frontend && npm install && npm run dev
 ```
 
-## Deploy
+## 部署
 
 ```bash
-export DATABASE_PASSWORD=...
 python3 scripts/ecs-deploy.py
 ```
 
 ## E2E
 
 ```bash
-cd frontend && npm ci
-npx playwright install chromium
-E2E_BASE_URL=http://118.31.57.25/agent-ops npm run test:e2e
+cd frontend && npm ci && npx playwright install chromium
+E2E_BASE_URL=http://118.31.57.25/spreadfleet npm run test:e2e
 ```

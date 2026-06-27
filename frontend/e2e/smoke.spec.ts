@@ -1,16 +1,16 @@
 import { test, expect } from '@playwright/test'
 
-const BASE = process.env.E2E_BASE_URL || 'http://118.31.57.25/agent-ops'
+const BASE = process.env.E2E_BASE_URL || 'http://118.31.57.25/spreadfleet'
 const EMAIL = `e2e_${Date.now()}@test.local`
 const PASS = 'testpass123'
 
-test.describe('Agent Ops E2E', () => {
+test.describe('SpreadFleet E2E', () => {
   test('register, login, browse market', async ({ page }) => {
     await page.goto(`${BASE}/register`)
     await page.locator('#reg-email').fill(EMAIL)
     await page.locator('#reg-password').fill(PASS)
     await page.getByRole('button', { name: '注册并登录' }).click()
-    await expect(page).toHaveURL(/\/agent-ops\/?$/)
+    await expect(page).toHaveURL(/\/spreadfleet\/?$/)
     await expect(page.getByRole('heading', { name: '总览' })).toBeVisible()
 
     await page.getByRole('link', { name: '🛒 账号市场' }).click()

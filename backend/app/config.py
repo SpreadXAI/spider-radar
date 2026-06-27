@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    app_name: str = "agent-ops"
+    app_name: str = "spread-fleet"
     environment: str = "test"
     api_prefix: str = "/api"
 

@@ -1,4 +1,4 @@
-const API_BASE = '/agent-ops/api'
+const API_BASE = '/spreadfleet/api'
 
 export type User = {
   id: number
