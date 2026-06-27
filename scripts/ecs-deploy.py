@@ -20,9 +20,10 @@ REGION = "cn-hangzhou"
 API_PORT = 9092
 
 NGINX_PATCH_SCRIPT = """from pathlib import Path
-path = Path("/etc/nginx/sites-enabled/api.imjson.cn")
-text = path.read_text()
 block = '''    # agent-ops-managed
+    location = /agent-ops {
+        return 302 /agent-ops/;
+    }
     location /agent-ops/ {
         root /var/www;
         index index.html;
@@ -38,11 +39,19 @@ block = '''    # agent-ops-managed
     }
     # agent-ops-managed-end
 '''
-anchor = "    # tactile-app-managed"
-if anchor not in text:
-    raise SystemExit("nginx anchor not found")
-path.write_text(text.replace(anchor, block + anchor, 1))
-print("nginx updated")
+for path_name, anchor in [
+    ("/etc/nginx/sites-enabled/api.imjson.cn", "    # tactile-app-managed"),
+    ("/etc/nginx/sites-enabled/data-air-tran", "    location = / {"),
+]:
+    path = Path(path_name)
+    text = path.read_text()
+    if "# agent-ops-managed" in text:
+        print(f"skip {path_name}")
+        continue
+    if anchor not in text:
+        raise SystemExit(f"anchor not found in {path_name}")
+    path.write_text(text.replace(anchor, block + anchor, 1))
+    print(f"patched {path_name}")
 """
 
 

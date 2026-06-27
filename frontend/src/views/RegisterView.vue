@@ -7,24 +7,24 @@
       </div>
       <form class="space-y-4" @submit.prevent="onSubmit">
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">登录账号 *</label>
-          <input v-model="form.username" class="input" type="text" required minlength="3" />
+          <label for="reg-username" class="mb-1 block text-sm font-medium text-slate-700">登录账号 *</label>
+          <input id="reg-username" v-model="form.username" class="input" type="text" required minlength="3" />
         </div>
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">显示昵称 *</label>
-          <input v-model="form.display_name" class="input" type="text" required />
+          <label for="reg-display" class="mb-1 block text-sm font-medium text-slate-700">显示昵称 *</label>
+          <input id="reg-display" v-model="form.display_name" class="input" type="text" required />
         </div>
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">邮箱（选填）</label>
-          <input v-model="form.email" class="input" type="email" />
+          <label for="reg-email" class="mb-1 block text-sm font-medium text-slate-700">邮箱（选填）</label>
+          <input id="reg-email" v-model="form.email" class="input" type="email" />
         </div>
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">密码 *</label>
-          <input v-model="form.password" class="input" type="password" required minlength="6" />
+          <label for="reg-password" class="mb-1 block text-sm font-medium text-slate-700">密码 *</label>
+          <input id="reg-password" v-model="form.password" class="input" type="password" required minlength="6" />
         </div>
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">确认密码 *</label>
-          <input v-model="confirmPassword" class="input" type="password" required />
+          <label for="reg-password2" class="mb-1 block text-sm font-medium text-slate-700">确认密码 *</label>
+          <input id="reg-password2" v-model="confirmPassword" class="input" type="password" required />
         </div>
         <p v-if="localError" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ localError }}</p>
         <p v-else-if="auth.error" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ auth.error }}</p>

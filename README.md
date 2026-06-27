@@ -36,6 +36,6 @@ python3 scripts/ecs-deploy.py
 
 ```bash
 cd frontend && npm ci
-cd .. && npx playwright install chromium
-E2E_BASE_URL=http://118.31.57.25/agent-ops npx playwright test
+npx playwright install chromium
+E2E_BASE_URL=http://118.31.57.25/agent-ops npm run test:e2e
 ```

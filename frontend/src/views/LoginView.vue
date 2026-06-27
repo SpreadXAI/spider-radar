@@ -7,12 +7,12 @@
       </div>
       <form class="space-y-4" @submit.prevent="onSubmit">
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">账号</label>
-          <input v-model="username" class="input" type="text" required autocomplete="username" />
+          <label for="login-username" class="mb-1 block text-sm font-medium text-slate-700">账号</label>
+          <input id="login-username" v-model="username" class="input" type="text" required autocomplete="username" />
         </div>
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">密码</label>
-          <input v-model="password" class="input" type="password" required autocomplete="current-password" />
+          <label for="login-password" class="mb-1 block text-sm font-medium text-slate-700">密码</label>
+          <input id="login-password" v-model="password" class="input" type="password" required autocomplete="current-password" />
         </div>
         <p v-if="auth.error" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ auth.error }}</p>
         <button class="btn-primary w-full" type="submit" :disabled="auth.loading">

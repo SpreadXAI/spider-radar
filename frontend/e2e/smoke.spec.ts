@@ -23,10 +23,19 @@ test.describe('Agent Ops E2E', () => {
   })
 
   test('login with existing flow', async ({ page }) => {
-    await page.goto(`${BASE}/login`)
-    await page.getByLabel('账号').fill('demo_test')
-    await page.getByLabel('密码').fill('demo123456')
-    // May fail if demo user not seeded — skip assertion on dashboard if login fails
+    const user = `e2e_login_${Date.now()}`
+    await page.goto(`${BASE}/register`)
+    await page.getByLabel('登录账号 *').fill(user)
+    await page.getByLabel('显示昵称 *').fill('E2E Login')
+    await page.getByLabel('密码 *').fill(PASS)
+    await page.getByLabel('确认密码 *').fill(PASS)
+    await page.getByRole('button', { name: '注册并登录' }).click()
+    await expect(page.getByText('总览')).toBeVisible()
+
+    await page.getByRole('button', { name: '退出登录' }).click()
+    await page.getByLabel('账号').fill(user)
+    await page.getByLabel('密码').fill(PASS)
     await page.getByRole('button', { name: '登录' }).click()
+    await expect(page.getByText('总览')).toBeVisible()
   })
 })
