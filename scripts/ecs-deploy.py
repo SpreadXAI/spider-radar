@@ -70,18 +70,23 @@ def run_remote(cmd: str, wait: int = 8) -> tuple[str, str]:
     return "Unknown", ""
 
 
-def build_remote_script(db_password: str, jwt_secret: str, clone_url: str) -> str:
-    db_password_esc = db_password.replace("'", "'\"'\"'")
+def build_remote_script(jwt_secret: str, clone_url: str) -> str:
     jwt_secret_esc = jwt_secret.replace("'", "'\"'\"'")
     nginx_b64 = base64.b64encode(NGINX_PATCH_SCRIPT.encode()).decode()
     return f"""#!/bin/bash
 set -euo pipefail
-export DATABASE_PASSWORD='{db_password_esc}'
 export JWT_SECRET='{jwt_secret_esc}'
 REMOTE_DIR=/opt/agent-ops
 WEB_DIR=/var/www/agent-ops
 API_PORT={API_PORT}
 CLONE_URL='{clone_url}'
+
+GW_PID=$(pgrep -f "uvicorn gateway.app.main:app" | head -1)
+export DATABASE_PASSWORD=$(tr '\\0' '\\n' < /proc/$GW_PID/environ | sed -n 's/^DF_DATABASE_PASSWORD=//p')
+export DATABASE_HOST=$(tr '\\0' '\\n' < /proc/$GW_PID/environ | sed -n 's/^DF_DATABASE_HOST=//p')
+export DATABASE_USER=$(tr '\\0' '\\n' < /proc/$GW_PID/environ | sed -n 's/^DF_DATABASE_USER=//p')
+export DATABASE_NAME=$(tr '\\0' '\\n' < /proc/$GW_PID/environ | sed -n 's/^TACTILE_DATABASE_NAME=//p')
+if [ -z "$DATABASE_PASSWORD" ]; then echo "missing DB password from tactile"; exit 1; fi
 
 mkdir -p "$REMOTE_DIR" "$WEB_DIR"
 if [ -d "$REMOTE_DIR/.git" ]; then
@@ -99,6 +104,9 @@ pip install -q -r backend/requirements.txt
 cat > backend/.env << EOF
 ENVIRONMENT=test
 DATABASE_PASSWORD=$DATABASE_PASSWORD
+DATABASE_HOST=$DATABASE_HOST
+DATABASE_USER=$DATABASE_USER
+DATABASE_NAME=$DATABASE_NAME
 JWT_SECRET=$JWT_SECRET
 EOF
 
@@ -157,11 +165,6 @@ curl -sf http://127.0.0.1:$API_PORT/health
 
 
 def main() -> None:
-    db_password = os.environ.get("DATABASE_PASSWORD") or os.environ.get("CURSOR_DEV_DB_PASSWORD")
-    if not db_password:
-        print("ERROR: set DATABASE_PASSWORD or CURSOR_DEV_DB_PASSWORD", file=sys.stderr)
-        sys.exit(1)
-
     jwt_secret = os.environ.get("JWT_SECRET", "agent-ops-test-jwt-secret-4918")
     gh_token = os.environ.get("github_access_token") or os.environ.get("GH_TOKEN", "")
 
@@ -178,7 +181,7 @@ def main() -> None:
     if gh_token:
         clone_url = f"https://{gh_token}@github.com/mijunri/agent-ops.git"
 
-    remote_script = build_remote_script(db_password, jwt_secret, clone_url)
+    remote_script = build_remote_script(jwt_secret, clone_url)
     encoded = base64.b64encode(remote_script.encode()).decode()
     cmd = f"echo {encoded} | base64 -d | bash"
     status, out = run_remote(cmd, wait=180)

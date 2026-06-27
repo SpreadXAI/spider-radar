@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,11 +11,11 @@ class Settings(BaseSettings):
     environment: str = "test"
     api_prefix: str = "/api"
 
-    database_host: str = "pgm-bp103m50b4w6569h.pg.rds.aliyuncs.com"
-    database_port: int = 5432
-    database_user: str = "tactile_app"
-    database_password: str = ""  # env: DATABASE_PASSWORD
-    database_name: str = "tactile"
+    database_host: str = Field(default="pgm-bp103m50b4w6569h.pg.rds.aliyuncs.com", validation_alias="DATABASE_HOST")
+    database_port: int = Field(default=5432, validation_alias="DATABASE_PORT")
+    database_user: str = Field(default="tactile_app", validation_alias="DATABASE_USER")
+    database_password: str = Field(default="", validation_alias="DATABASE_PASSWORD")
+    database_name: str = Field(default="tactile", validation_alias="DATABASE_NAME")
     database_schema: str = "agent_ops_test"
 
     jwt_secret: str = "agent-ops-test-secret-change-in-prod"
